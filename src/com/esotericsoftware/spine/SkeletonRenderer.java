@@ -46,7 +46,6 @@ import com.esotericsoftware.spine.attachments.RegionAttachment;
 import com.esotericsoftware.spine.attachments.SkeletonAttachment;
 import com.esotericsoftware.spine.utils.SkeletonClipping;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
-import com.esotericsoftware.spine.utils.TwoColorPolygonBatch3D;
 
 public class SkeletonRenderer {
 	static private final short[] quadTriangles = {0, 1, 2, 2, 3, 0};
@@ -72,10 +71,6 @@ public class SkeletonRenderer {
 	public void draw (Batch batch, Skeleton skeleton) {
 		if (batch instanceof TwoColorPolygonBatch) {
 			draw((TwoColorPolygonBatch)batch, skeleton);
-			return;
-		}
-		if (batch instanceof TwoColorPolygonBatch3D) {
-			draw((TwoColorPolygonBatch3D)batch, skeleton);
 			return;
 		}
 		if (batch instanceof PolygonSpriteBatch) {
@@ -126,9 +121,9 @@ public class SkeletonRenderer {
 					vertices[v + 2] = uvs[u + 1];
 				}
 
-				if (vertexEffect != null) applyVertexEffect(vertices, 24, 5, c, 0);
+				if (vertexEffect != null) applyVertexEffect(vertices, 20, 5, c, 0);
 
-				batch.draw(region.getRegion().getTexture(), vertices, 0, 24);
+				batch.draw(region.getRegion().getTexture(), vertices, 0, 20);
 
 			} else if (attachment instanceof ClippingAttachment) {
 				clipper.clipStart(slot, (ClippingAttachment)attachment);
@@ -390,141 +385,6 @@ public class SkeletonRenderer {
 						}
 					} else {
 						for (int v = 2, u = 0; v < verticesLength; v += 6, u += 2) {
-							vertices[v] = light;
-							vertices[v + 1] = dark;
-							vertices[v + 2] = uvs[u];
-							vertices[v + 3] = uvs[u + 1];
-						}
-					}
-					batch.drawTwoColor(texture, vertices, 0, verticesLength, triangles, 0, triangles.length);
-				}
-			}
-
-			clipper.clipEnd(slot);
-		}
-		clipper.clipEnd();
-		if (vertexEffect != null) vertexEffect.end();
-	}
-
-	/** Renders the specified skeleton, including meshes and two color tinting.
-	 * <p>
-	 * This method may change the batch's {@link Batch#setBlendFunctionSeparate(int, int, int, int) blending function}. The
-	 * previous blend function is not restored, since that could result in unnecessary flushes, depending on what is rendered
-	 * next. */
-	@SuppressWarnings("null")
-	public void draw (TwoColorPolygonBatch3D batch, Skeleton skeleton, float zPosition) {
-		if (batch == null) throw new IllegalArgumentException("batch cannot be null.");
-		if (skeleton == null) throw new IllegalArgumentException("skeleton cannot be null.");
-
-		Vector2 tempPosition = this.temp, tempUV = this.temp2;
-		Color tempLight1 = this.temp3, tempDark1 = this.temp4;
-		Color tempLight2 = this.temp5, tempDark2 = this.temp6;
-		VertexEffect vertexEffect = this.vertexEffect;
-		if (vertexEffect != null) vertexEffect.begin(skeleton);
-
-		boolean premultipliedAlpha = this.premultipliedAlpha;
-		batch.setPremultipliedAlpha(premultipliedAlpha);
-		BlendMode blendMode = null;
-		int verticesLength = 0;
-		float[] vertices = null, uvs = null;
-		short[] triangles = null;
-		Color color = null, skeletonColor = skeleton.color;
-		float r = skeletonColor.r, g = skeletonColor.g, b = skeletonColor.b, a = skeletonColor.a;
-		Array<Slot> drawOrder = skeleton.drawOrder;
-		for (int i = 0, n = drawOrder.size; i < n; i++) {
-			Slot slot = drawOrder.get(i);
-			if (!slot.bone.active) continue;
-			Texture texture = null;
-			int vertexSize = clipper.isClipping() ? 2 : 7;
-			Attachment attachment = slot.attachment;
-			if (attachment instanceof RegionAttachment) {
-				RegionAttachment region = (RegionAttachment)attachment;
-				verticesLength = vertexSize << 2;
-				vertices = this.vertices.items;
-				region.computeWorldVertices3D(slot.getBone(), vertices, 0, vertexSize, zPosition);
-				triangles = quadTriangles;
-				texture = region.getRegion().getTexture();
-				uvs = region.getUVs();
-				color = region.getColor();
-
-			} else if (attachment instanceof MeshAttachment) {
-				MeshAttachment mesh = (MeshAttachment)attachment;
-				int count = mesh.getWorldVerticesLength();
-				verticesLength = (count >> 1) * vertexSize;
-				vertices = this.vertices.setSize(verticesLength);
-				mesh.computeWorldVertices(slot, 0, count, vertices, 0, vertexSize);
-				triangles = mesh.getTriangles();
-				texture = mesh.getRegion().getTexture();
-				uvs = mesh.getUVs();
-				color = mesh.getColor();
-
-			} else if (attachment instanceof ClippingAttachment) {
-				ClippingAttachment clip = (ClippingAttachment)attachment;
-				clipper.clipStart(slot, clip);
-				continue;
-
-			} else if (attachment instanceof SkeletonAttachment) {
-				Skeleton attachmentSkeleton = ((SkeletonAttachment)attachment).getSkeleton();
-				if (attachmentSkeleton != null) draw(batch, attachmentSkeleton);
-			}
-
-			if (texture != null) {
-				Color lightColor = slot.getColor();
-				float alpha = a * lightColor.a * color.a * 255;
-				float multiplier = premultipliedAlpha ? alpha : 255;
-
-				BlendMode slotBlendMode = slot.data.getBlendMode();
-				if (slotBlendMode != blendMode) {
-					if (slotBlendMode == BlendMode.additive && premultipliedAlpha) {
-						slotBlendMode = BlendMode.normal;
-						alpha = 0;
-					}
-					blendMode = slotBlendMode;
-					batch.setBlendFunction(blendMode.getSource(premultipliedAlpha), blendMode.getDest());
-				}
-
-				float red = r * color.r * multiplier;
-				float green = g * color.g * multiplier;
-				float blue = b * color.b * multiplier;
-				float light = NumberUtils.intToFloatColor(((int)alpha << 24) //
-						| ((int)(blue * lightColor.b) << 16) //
-						| ((int)(green * lightColor.g) << 8) //
-						| (int)(red * lightColor.r));
-				Color darkColor = slot.getDarkColor();
-				float dark = darkColor == null ? 0
-						: NumberUtils.intToFloatColor((int)(blue * darkColor.b) << 16 //
-						| (int)(green * darkColor.g) << 8 //
-						| (int)(red * darkColor.r));
-
-				if (clipper.isClipping()) {
-					clipper.clipTriangles(vertices, verticesLength, triangles, triangles.length, uvs, light, dark, true);
-					FloatArray clippedVertices = clipper.getClippedVertices();
-					ShortArray clippedTriangles = clipper.getClippedTriangles();
-					if (vertexEffect != null) applyVertexEffect(clippedVertices.items, clippedVertices.size, 7, light, dark);
-					batch.drawTwoColor(texture, clippedVertices.items, 0, clippedVertices.size, clippedTriangles.items, 0,
-							clippedTriangles.size);
-				} else {
-					if (vertexEffect != null) {
-						tempLight1.set(NumberUtils.floatToIntColor(light));
-						tempDark1.set(NumberUtils.floatToIntColor(dark));
-						for (int v = 0, u = 0; v < verticesLength; v += 7, u += 2) {
-							tempPosition.x = vertices[v];
-							tempPosition.y = vertices[v + 1];
-							tempLight2.set(tempLight1);
-							tempDark2.set(tempDark1);
-							tempUV.x = uvs[u];
-							tempUV.y = uvs[u + 1];
-							vertexEffect.transform(tempPosition, tempUV, tempLight2, tempDark2);
-							vertices[v] = tempPosition.x;
-							vertices[v + 1] = tempPosition.y;
-							vertices[v + 2] = 0; // z
-							vertices[v + 3] = tempLight2.toFloatBits();
-							vertices[v + 4] = tempDark2.toFloatBits();
-							vertices[v + 5] = tempUV.x;
-							vertices[v + 6] = tempUV.y;
-						}
-					} else {
-						for (int v = 3, u = 0; v < verticesLength; v += 7, u += 2) {
 							vertices[v] = light;
 							vertices[v + 1] = dark;
 							vertices[v + 2] = uvs[u];

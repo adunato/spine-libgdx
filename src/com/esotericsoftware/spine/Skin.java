@@ -30,7 +30,6 @@
 package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
 
 import com.esotericsoftware.spine.attachments.Attachment;
@@ -110,10 +109,6 @@ public class Skin {
 	/** Returns all attachments in this skin. */
 	public Array<SkinEntry> getAttachments () {
 		return attachments.orderedKeys();
-	}
-
-	public ObjectMap.Values<Attachment> getAttachmentsValues() {
-		return attachments.values();
 	}
 
 	/** Returns all attachments in this skin for the specified slot index. */

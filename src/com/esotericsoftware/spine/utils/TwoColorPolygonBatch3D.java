@@ -43,6 +43,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.NumberUtils;
 
+
 import static com.esotericsoftware.spine.utils.SpineUtils.arraycopy;
 
 /** A batch that renders polygons and performs tinting using a light and dark color.
@@ -112,7 +113,8 @@ public class TwoColorPolygonBatch3D implements PolygonBatch {
 
 	@Override
 	public void begin () {
-		if (drawing) throw new IllegalStateException("end must be called before begin.");
+		if (drawing)
+			throw new IllegalStateException("end must be called before begin.");
 		Gdx.gl.glDepthMask(false);
 		shader.begin();
 		setupMatrices();
@@ -1297,8 +1299,8 @@ public class TwoColorPolygonBatch3D implements PolygonBatch {
 		if (vertexIndex == 0) return;
 
 		totalRenderCalls++;
-
-		lastTexture.bind();
+		if(lastTexture != null)
+			lastTexture.bind();
 		Mesh mesh = this.mesh;
 		mesh.setVertices(vertices, 0, vertexIndex);
 		mesh.setIndices(triangles, 0, triangleIndex);

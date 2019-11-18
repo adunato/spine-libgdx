@@ -553,7 +553,8 @@ public class Skeleton {
 					String name = slot.data.attachmentName;
 					if (name != null) {
 						Attachment attachment = newSkin.getAttachment(i, name);
-						if (attachment != null) slot.setAttachment(attachment);
+						if (attachment != null)
+							slot.setAttachment(attachment);
 					}
 				}
 			}

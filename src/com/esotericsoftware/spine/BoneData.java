@@ -33,8 +33,8 @@ import com.badlogic.gdx.graphics.Color;
 
 /** Stores the setup pose for a {@link Bone}. */
 public class BoneData {
-	int index;
-	String name;
+	final int index;
+	final String name;
 	final BoneData parent;
 	float length;
 	float x, y, rotation, scaleX = 1, scaleY = 1, shearX, shearY;
@@ -75,17 +75,9 @@ public class BoneData {
 		return index;
 	}
 
-	public void setIndex(int index) {
-		this.index = index;
-	}
-
 	/** The name of the bone, which is unique across all bones in the skeleton. */
 	public String getName () {
 		return name;
-	}
-
-	public void setName (String name) {
-		this.name = name;
 	}
 
 	/** @return May be null. */

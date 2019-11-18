@@ -179,40 +179,6 @@ public class RegionAttachment extends Attachment {
 		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
 	}
 
-	public void computeWorldVertices3D (Bone bone, float[] worldVertices, int offset, int stride, float zPosition) {
-		float[] vertexOffset = this.offset;
-		float x = bone.getWorldX(), y = bone.getWorldY();
-		float a = bone.getA(), b = bone.getB(), c = bone.getC(), d = bone.getD();
-		float offsetX, offsetY;
-
-		offsetX = vertexOffset[BRX];
-		offsetY = vertexOffset[BRY];
-		worldVertices[offset] = offsetX * a + offsetY * b + x; // br
-		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
-		worldVertices[offset + 2] = zPosition; //z
-		offset += stride;
-
-		offsetX = vertexOffset[BLX];
-		offsetY = vertexOffset[BLY];
-		worldVertices[offset] = offsetX * a + offsetY * b + x; // bl
-		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
-		worldVertices[offset + 2] = zPosition; //z
-		offset += stride;
-
-		offsetX = vertexOffset[ULX];
-		offsetY = vertexOffset[ULY];
-		worldVertices[offset] = offsetX * a + offsetY * b + x; // ul
-		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
-		worldVertices[offset + 2] = zPosition; //z
-		offset += stride;
-
-		offsetX = vertexOffset[URX];
-		offsetY = vertexOffset[URY];
-		worldVertices[offset] = offsetX * a + offsetY * b + x; // ur
-		worldVertices[offset + 1] = offsetX * c + offsetY * d + y;
-		worldVertices[offset + 2] = zPosition; //z
-	}
-
 	/** For each of the 4 vertices, a pair of <code>x,y</code> values that is the local position of the vertex.
 	 * <p>
 	 * See {@link #updateOffset()}. */

@@ -56,7 +56,7 @@
 
 	<build>
 		<sourceDirectory>src</sourceDirectory>
-		<testSourceDirectory>test</testSourceDirectory>
+		<!--<testSourceDirectory>test</testSourceDirectory>-->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -100,9 +100,9 @@
 						<goals>
 							<goal>perform</goal>
 						</goals>
-						<configuration>
-							<pomFile>spine-libgdx/spine-libgdx/pom.xml</pomFile>
-						</configuration>
+						<!--<configuration>-->
+							<!--<pomFile>spine-libgdx/spine-libgdx/pom.xml</pomFile>-->
+						<!--</configuration>-->
 					</execution>
 				</executions>
 			</plugin>

@@ -27,22 +27,22 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-package com.esotericsoftware.spine.utils;
+		package com.esotericsoftware.spine.utils;
 
-import com.badlogic.gdx.assets.AssetDescriptor;
-import com.badlogic.gdx.assets.AssetLoaderParameters;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
-import com.badlogic.gdx.assets.loaders.FileHandleResolver;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.utils.Array;
+		import com.badlogic.gdx.assets.AssetDescriptor;
+		import com.badlogic.gdx.assets.AssetLoaderParameters;
+		import com.badlogic.gdx.assets.AssetManager;
+		import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader;
+		import com.badlogic.gdx.assets.loaders.FileHandleResolver;
+		import com.badlogic.gdx.files.FileHandle;
+		import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+		import com.badlogic.gdx.utils.Array;
 
-import com.esotericsoftware.spine.SkeletonBinary;
-import com.esotericsoftware.spine.SkeletonData;
-import com.esotericsoftware.spine.SkeletonJson;
-import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
-import com.esotericsoftware.spine.attachments.AttachmentLoader;
+		import com.esotericsoftware.spine.SkeletonBinary;
+		import com.esotericsoftware.spine.SkeletonData;
+		import com.esotericsoftware.spine.SkeletonJson;
+		import com.esotericsoftware.spine.attachments.AtlasAttachmentLoader;
+		import com.esotericsoftware.spine.attachments.AttachmentLoader;
 
 /** An asset loader to create and load skeleton data. The data file is assumed to be binary if it ends with <code>.skel</code>,
  * otherwise JSON is assumed. The {@link SkeletonDataParameter} can provide a texture atlas name or an {@link AttachmentLoader}.
@@ -50,7 +50,7 @@ import com.esotericsoftware.spine.attachments.AttachmentLoader;
  * When a texture atlas name is used, the texture atlas is loaded by the asset manager as a dependency.
  * <p>
  * Example:
- * 
+ *
  * <pre>
  * // Load skeleton.json and skeleton.atlas:
  * assetManager.load("skeleton.json", SkeletonData.class);

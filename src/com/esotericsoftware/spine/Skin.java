@@ -30,6 +30,7 @@
 package com.esotericsoftware.spine;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.OrderedMap;
 import com.esotericsoftware.spine.attachments.Attachment;
 import com.esotericsoftware.spine.attachments.MeshAttachment;
@@ -159,6 +160,10 @@ public class Skin {
 		}
 	}
 
+	public ObjectMap.Values<SkinEntry> getAttachmentsValues() {
+		return attachments.values();
+	}
+
 	/** Stores an entry in the skin consisting of the slot index, name, and attachment **/
 	static public class SkinEntry {
 		int slotIndex;
@@ -210,5 +215,6 @@ public class Skin {
 		public String toString () {
 			return slotIndex + ":" + name;
 		}
+
 	}
 }

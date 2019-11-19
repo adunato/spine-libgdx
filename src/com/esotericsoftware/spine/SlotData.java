@@ -33,8 +33,8 @@ import com.badlogic.gdx.graphics.Color;
 
 /** Stores the setup pose for a {@link Slot}. */
 public class SlotData {
-	final int index;
-	final String name;
+	int index;
+	String name;
 	final BoneData boneData;
 	final Color color = new Color(1, 1, 1, 1);
 	Color darkColor;
@@ -58,6 +58,14 @@ public class SlotData {
 	/** The name of the slot, which is unique across all slots in the skeleton. */
 	public String getName () {
 		return name;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	/** The bone this slot belongs to. */

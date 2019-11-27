@@ -1293,87 +1293,100 @@ public class AnimationState {
         boolean drainDisabled;
 
         void start(TrackEntry entry) {
-            objects.add(EventType.start);
-            objects.add(entry);
+            synchronized (objects) {
+                objects.add(EventType.start);
+                objects.add(entry);
+            }
             animationsChanged = true;
         }
 
         void interrupt(TrackEntry entry) {
-            objects.add(EventType.interrupt);
-            objects.add(entry);
+            synchronized (objects) {
+                objects.add(EventType.interrupt);
+                objects.add(entry);
+            }
         }
 
         void end(TrackEntry entry) {
-            objects.add(EventType.end);
-            objects.add(entry);
+            synchronized (objects) {
+                objects.add(EventType.end);
+                objects.add(entry);
+            }
             animationsChanged = true;
         }
 
         void dispose(TrackEntry entry) {
-            objects.add(EventType.dispose);
-            objects.add(entry);
+            synchronized (objects) {
+                objects.add(EventType.dispose);
+                objects.add(entry);
+            }
         }
 
         void complete(TrackEntry entry) {
-            objects.add(EventType.complete);
-            objects.add(entry);
+            synchronized (objects) {
+                objects.add(EventType.complete);
+                objects.add(entry);
+            }
         }
 
         void event(TrackEntry entry, Event event) {
-            objects.add(EventType.event);
-            objects.add(entry);
-            objects.add(event);
+            synchronized (objects) {
+                objects.add(EventType.event);
+                objects.add(entry);
+                objects.add(event);
+            }
         }
 
         void drain() {
             if (drainDisabled) return; // Not reentrant.
             drainDisabled = true;
-
-            Array objects = this.objects;
-            Array<AnimationStateListener> listeners = AnimationState.this.listeners;
-            for (int i = 0; i < objects.size; i += 2) {
-                if (!(objects.get(i) instanceof EventType))
-                    throw new IllegalStateException();
-                EventType type = (EventType) objects.get(i);
-                if (!(objects.get(i+1) instanceof TrackEntry))
-                    throw new IllegalStateException();
-                TrackEntry entry = (TrackEntry) objects.get(i + 1);
-                switch (type) {
-                    case start:
-                        if (entry.listener != null) entry.listener.start(entry);
-                        for (int ii = 0; ii < listeners.size; ii++)
-                            listeners.get(ii).start(entry);
-                        break;
-                    case interrupt:
-                        if (entry.listener != null) entry.listener.interrupt(entry);
-                        for (int ii = 0; ii < listeners.size; ii++)
-                            listeners.get(ii).interrupt(entry);
-                        break;
-                    case end:
-                        if (entry.listener != null) entry.listener.end(entry);
-                        for (int ii = 0; ii < listeners.size; ii++)
-                            listeners.get(ii).end(entry);
-                        // Fall through.
-                    case dispose:
-                        if (entry.listener != null) entry.listener.dispose(entry);
-                        for (int ii = 0; ii < listeners.size; ii++)
-                            listeners.get(ii).dispose(entry);
-                        trackEntryPool.free(entry);
-                        break;
-                    case complete:
-                        if (entry.listener != null) entry.listener.complete(entry);
-                        for (int ii = 0; ii < listeners.size; ii++)
-                            listeners.get(ii).complete(entry);
-                        break;
-                    case event:
-                        Event event = (Event) objects.get(i++ + 2);
-                        if (entry.listener != null) entry.listener.event(entry, event);
-                        for (int ii = 0; ii < listeners.size; ii++)
-                            listeners.get(ii).event(entry, event);
-                        break;
+            synchronized (objects) {
+                Array objects = this.objects;
+                Array<AnimationStateListener> listeners = AnimationState.this.listeners;
+                for (int i = 0; i < objects.size; i += 2) {
+                    if (!(objects.get(i) instanceof EventType))
+                        throw new IllegalStateException();
+                    EventType type = (EventType) objects.get(i);
+                    if (!(objects.get(i + 1) instanceof TrackEntry))
+                        throw new IllegalStateException();
+                    TrackEntry entry = (TrackEntry) objects.get(i + 1);
+                    switch (type) {
+                        case start:
+                            if (entry.listener != null) entry.listener.start(entry);
+                            for (int ii = 0; ii < listeners.size; ii++)
+                                listeners.get(ii).start(entry);
+                            break;
+                        case interrupt:
+                            if (entry.listener != null) entry.listener.interrupt(entry);
+                            for (int ii = 0; ii < listeners.size; ii++)
+                                listeners.get(ii).interrupt(entry);
+                            break;
+                        case end:
+                            if (entry.listener != null) entry.listener.end(entry);
+                            for (int ii = 0; ii < listeners.size; ii++)
+                                listeners.get(ii).end(entry);
+                            // Fall through.
+                        case dispose:
+                            if (entry.listener != null) entry.listener.dispose(entry);
+                            for (int ii = 0; ii < listeners.size; ii++)
+                                listeners.get(ii).dispose(entry);
+                            trackEntryPool.free(entry);
+                            break;
+                        case complete:
+                            if (entry.listener != null) entry.listener.complete(entry);
+                            for (int ii = 0; ii < listeners.size; ii++)
+                                listeners.get(ii).complete(entry);
+                            break;
+                        case event:
+                            Event event = (Event) objects.get(i++ + 2);
+                            if (entry.listener != null) entry.listener.event(entry, event);
+                            for (int ii = 0; ii < listeners.size; ii++)
+                                listeners.get(ii).event(entry, event);
+                            break;
+                    }
                 }
+                clear();
             }
-            clear();
 
             drainDisabled = false;
         }

@@ -31,6 +31,7 @@ package com.esotericsoftware.spine;
 
 import static com.esotericsoftware.spine.Animation.RotateTimeline.*;
 
+import com.adunato.dynasty.common.DynastyPool;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.FloatArray;
 import com.badlogic.gdx.utils.IntArray;
@@ -105,8 +106,8 @@ public class AnimationState {
     boolean animationsChanged;
     private float timeScale = 1;
 
-    final Pool<TrackEntry> trackEntryPool = new Pool() {
-        protected Object newObject() {
+    final DynastyPool<TrackEntry> trackEntryPool = new DynastyPool() {
+        protected TrackEntry newObject() {
             return new TrackEntry();
         }
     };
@@ -703,6 +704,8 @@ public class AnimationState {
      */
     private TrackEntry trackEntry(int trackIndex, Animation animation, boolean loop, TrackEntry last) {
         TrackEntry entry = trackEntryPool.obtain();
+        if(entry == null)
+            throw new IllegalStateException();
         entry.trackIndex = trackIndex;
         entry.animation = animation;
         entry.loop = loop;
@@ -912,7 +915,7 @@ public class AnimationState {
      * <p>
      * References to a track entry must not be kept after the {@link AnimationStateListener#dispose(TrackEntry)} event occurs.
      */
-    static public class TrackEntry implements Poolable {
+    static public class TrackEntry implements DynastyPool.Poolable {
         Animation animation;
         TrackEntry next, mixingFrom, mixingTo;
         AnimationStateListener listener;
@@ -937,6 +940,11 @@ public class AnimationState {
             timelineMode.clear();
             timelineHoldMix.clear();
             timelinesRotation.clear();
+        }
+
+        @Override
+        public void allocate() {
+
         }
 
         /**
